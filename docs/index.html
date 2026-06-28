@@ -92,19 +92,54 @@
 
   <!-- Info overlay -->
   <div id="info-overlay" class="overlay" hidden>
-    <div class="overlay-inner">
+    <div class="overlay-inner info-scrollable">
       <button id="info-close" class="overlay-close" aria-label="Close">×</button>
       <h1>Helgoland Spectral Lattice</h1>
-      <p class="lead">An interactive audio-visual instrument after Arthur Segal's painting
-        <em>Helgoland</em> (1923).</p>
-      <p>The piece follows Segal's principle of <em>Gleichwertigkeit</em> — Equivalence: no element
-        holds hierarchy over another. A single harmonic tone is decomposed into sixteen spectral
-        slices. Only with all sixteen sounding together is the complete waveform reconstructed.</p>
+      <p class="lead">An interactive audio-visual instrument after Arthur Segal's painting 
+        <a href="https://berlinischegalerie.de/en/collection/collection-online/the-fine-art-collection-online/" target="_blank" rel="noopener"><em>Helgoland</em> (1923)</a>.</p>
+      
+      <p>Developed for the <strong>Sounding Collection Project</strong>.</p>
+      
+      <p>The piece follows Segal's principle of <em>Gleichwertigkeit</em> — Equivalence: no element holds hierarchy over another. A single harmonic tone is decomposed into sixteen spectral slices. Only with all sixteen sounding together is the complete waveform reconstructed.</p>
+      
       <p><strong>Switch</strong> — toggle slices on and off; flip any pad to see its waveform.<br/>
         <strong>Pad</strong> — hold to play, release to stop.<br/>
         <strong>Sequence</strong> — the lattice plays itself.</p>
-      <p class="credit">Sound synthesised live in the browser (Web Audio API) — 64 partials, 16 voices.<br/>
-        Created by <a id="creator-link" href="#" target="_blank" rel="noopener">[ your website ]</a>.</p>
+
+      <hr class="info-divider" />
+
+      <div class="info-columns">
+        <div class="info-column">
+          <h3>Creator</h3>
+          <p>Created by Romaina, an audio designer and DSP maker based in Berlin, originally from Piatra Neamț. With a background in classical piano, she is passionate about the intersection of physics, art, and philosophy.</p>
+          <p><a href="http://www.renah.info" target="_blank" rel="noopener">www.renah.info</a></p>
+          <p class="license-text">Copyright &copy; 2026. This project is open-source. Anyone using this work or its code must explicitly credit the original creator.</p>
+        </div>
+        
+        <div class="info-column">
+          <h3>Berlinische Galerie</h3>
+          <p class="address-text">
+            Landesmuseum für Moderne Kunst, Fotografie und Architektur<br/>
+            Stiftung Öffentlichen Rechts<br/>
+            Alte Jakobstraße 124 – 128<br/>
+            10969 Berlin, Germany
+          </p>
+          <p class="contact-text">
+            <a href="mailto:bg@berlinischegalerie.de">bg@berlinischegalerie.de</a><br/>
+            Tel +49 (0)30-789 02-600<br/>
+            Fax +49 (0)30-789 02-700
+          </p>
+        </div>
+      </div>
+      
+      <div class="info-logos">
+        <a href="http://www.renah.info" target="_blank" rel="noopener">
+          <img src="assets/renah Logo White.jpg" alt="Renah Logo" class="info-logo" />
+        </a>
+        <a href="https://berlinischegalerie.de" target="_blank" rel="noopener">
+          <img src="assets/berlinische_galerie.png" alt="Berlinische Galerie" class="info-logo" />
+        </a>
+      </div>
     </div>
   </div>
 

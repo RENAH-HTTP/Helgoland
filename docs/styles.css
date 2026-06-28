@@ -363,6 +363,75 @@ html,body{
 }
 .banner[hidden]{ display:none; }
 
+/* ===== INFO OVERLAY ADDITIONS ===== */
+.info-scrollable {
+  max-height: 90vh;
+  overflow-y: auto;
+  padding-right: 12px;
+}
+.info-scrollable::-webkit-scrollbar {
+  width: 6px;
+}
+.info-scrollable::-webkit-scrollbar-thumb {
+  background: rgba(255, 255, 255, 0.2);
+  border-radius: 4px;
+}
+.info-divider {
+  border: 0;
+  height: 1px;
+  background: rgba(255, 255, 255, 0.1);
+  margin: 24px 0;
+}
+.info-columns {
+  display: flex;
+  gap: 32px;
+  flex-wrap: wrap;
+}
+.info-column {
+  flex: 1;
+  min-width: 200px;
+}
+.info-column h3 {
+  font-weight: 500;
+  font-size: 14px;
+  color: #fff;
+  margin-bottom: 12px;
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+}
+.info-column p {
+  margin-bottom: 12px;
+  font-size: 13px;
+  color: #ccc;
+}
+.info-column .license-text {
+  font-size: 11px;
+  color: #888;
+  margin-top: 16px;
+}
+.info-column .address-text, .info-column .contact-text {
+  font-size: 12px;
+}
+.info-logos {
+  display: flex;
+  gap: 32px;
+  margin-top: 32px;
+  align-items: center;
+  justify-content: flex-start;
+  padding-top: 24px;
+  border-top: 1px solid rgba(255,255,255,0.05);
+}
+.info-logo {
+  max-height: 48px;
+  max-width: 140px;
+  object-fit: contain;
+  opacity: 0.6;
+  transition: opacity 0.3s ease;
+}
+.info-logo:hover {
+  opacity: 1;
+}
+
 /* ===== RESPONSIVE ===== */
 @media(max-width:800px){
   #controls { gap: 12px; }
