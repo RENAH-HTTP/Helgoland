@@ -1,0 +1,2 @@
+so for the ui for the app i want to have a painting and it highlights and you an press to see the spectruma nd a spectrogram on tol and a one slide horizontally which and alte r the partials volume .. called form 
+we also need a olume know abd in the coner an info button where it tell theuser about em and my webstie and everything we must find a way to but it on the web to have it there permantently for people to acces so i have to build the bestitte and deploy it - let's o GitHub pages.. will it always stay on with githubpages? or should i do cloudfare? 

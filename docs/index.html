@@ -1,0 +1,125 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, viewport-fit=cover" />
+<meta name="theme-color" content="#080808" />
+<meta name="description" content="Helgoland Spectral Lattice — an interactive audio-visual instrument after Arthur Segal's Helgoland (1923)." />
+<title>Helgoland · Spectral Lattice</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@200;300;400;500;600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="styles.css?v=2" />
+</head>
+<body>
+
+  <main id="stage">
+    <div id="grid" class="grid" data-mode="switch" role="group" aria-label="16 spectral voices"></div>
+  </main>
+
+  <!-- ======== CONTROLS BAR ======== -->
+  <div id="controls" aria-label="Controls">
+
+    <div class="ctrl form-ctrl">
+      <label for="form">FORM</label>
+      <input id="form" class="form-slider" type="range" min="0" max="1" step="0.001" value="0" aria-label="Form" />
+    </div>
+
+    <div class="ctrl flow-ctrl" id="flow-container" style="display: none;">
+      <label>FLOW</label>
+      <button id="flow-btn" class="mode-btn" type="button" aria-label="Random Flow">
+        <span id="flow-label" style="color: rgba(255,255,255,0.3);">OFF</span>
+      </button>
+    </div>
+
+    <div class="ctrl root-ctrl">
+      <label for="root">ROOT</label>
+      <input id="root" class="form-slider root-slider" type="range" min="40" max="120" step="1" value="80" aria-label="Root frequency" />
+    </div>
+
+    <div class="ctrl loud-ctrl">
+      <label for="loudness">LOUD</label>
+      <input id="loudness" class="form-slider" type="range" min="0" max="1" step="0.01" value="0.15" aria-label="Loudness" />
+    </div>
+
+
+
+    <div class="ctrl mode-ctrl">
+      <label>MODE</label>
+      <button id="mode-btn" class="mode-btn" type="button" aria-label="Mode">
+        <span id="mode-label">SWITCH</span>
+      </button>
+    </div>
+
+    <div class="ctrl auto-tune-ctrl" id="auto-tune-container" style="display: none;">
+      <label>TUNE</label>
+      <button id="auto-tune-btn" class="mode-btn" type="button" aria-label="Auto Tune">
+        <span id="auto-tune-label" style="color: rgba(255,255,255,0.3);">OFF</span>
+      </button>
+    </div>
+
+    <div class="ctrl tempo-ctrl" id="tempo-container" style="display: none;">
+      <label>TEMPO</label>
+      <button id="tempo-btn" class="mode-btn" type="button" aria-label="Tempo">
+        <span id="tempo-label">MED</span>
+      </button>
+    </div>
+
+    <div class="ctrl fx-toggle-ctrl">
+      <label>FX</label>
+      <button id="fx-toggle-btn" class="mode-btn" type="button" aria-label="Toggle Effect">
+        <span id="fx-name">OFF</span>
+      </button>
+    </div>
+
+    <div class="ctrl fx-mix-ctrl">
+      <label for="fx-slider">MIX</label>
+      <input id="fx-slider" class="form-slider" type="range" min="0" max="1" step="0.01" value="0.2" aria-label="FX Mix" />
+    </div>
+    <div class="ctrl flip-ctrl">
+      <button id="flip-all-btn" class="mode-btn icon-btn" type="button" aria-label="Flip all pads" title="Flip all pads">
+        <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 8a8 8 0 0 1 14-3M20 16a8 8 0 0 1-14 3" fill="none" stroke="currentColor" stroke-width="2"/><path d="M18 2v4h-4M6 22v-4h4" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+      </button>
+    </div>
+
+    <div class="ctrl info-ctrl">
+      <button id="info-btn" class="mode-btn icon-btn" type="button" aria-label="About this piece" title="Info">
+        <svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="9" fill="none" stroke="currentColor" stroke-width="2"/><path d="M12 16v-4M12 8h.01" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+      </button>
+    </div>
+
+  </div>
+
+  <!-- Info overlay -->
+  <div id="info-overlay" class="overlay" hidden>
+    <div class="overlay-inner">
+      <button id="info-close" class="overlay-close" aria-label="Close">×</button>
+      <h1>Helgoland Spectral Lattice</h1>
+      <p class="lead">An interactive audio-visual instrument after Arthur Segal's painting
+        <em>Helgoland</em> (1923).</p>
+      <p>The piece follows Segal's principle of <em>Gleichwertigkeit</em> — Equivalence: no element
+        holds hierarchy over another. A single harmonic tone is decomposed into sixteen spectral
+        slices. Only with all sixteen sounding together is the complete waveform reconstructed.</p>
+      <p><strong>Switch</strong> — toggle slices on and off; flip any pad to see its waveform.<br/>
+        <strong>Pad</strong> — hold to play, release to stop.<br/>
+        <strong>Sequence</strong> — the lattice plays itself.</p>
+      <p class="credit">Sound synthesised live in the browser (Web Audio API) — 64 partials, 16 voices.<br/>
+        Created by <a id="creator-link" href="#" target="_blank" rel="noopener">[ your website ]</a>.</p>
+    </div>
+  </div>
+
+  <!-- Splash -->
+  <div id="splash" class="overlay splash">
+    <div class="splash-inner">
+      <div class="splash-title">HELGOLAND</div>
+      <div class="splash-rule"></div>
+      <div class="splash-sub" id="splash-sub">TAP TO BEGIN</div>
+    </div>
+  </div>
+
+  <div id="banner" class="banner" hidden></div>
+
+  <script src="audio-engine.js?v=3"></script>
+  <script src="app.js?v=3"></script>
+</body>
+</html>

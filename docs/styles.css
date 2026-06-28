@@ -1,0 +1,384 @@
+/* ============================================================
+   Helgoland Spectral Lattice
+   Gallery-grade UI — each pad is a flippable card.
+   Front = painting cell · Back = oscilloscope.
+   Zero gaps, full bleed. Controls float as a compact pill.
+   ============================================================ */
+
+:root{
+  --bg:#080808;
+  --ink:#f0f0f0;
+  --ink-dim:#666;
+  --accent:#7aadff;
+  --font:"Inter", system-ui, -apple-system, "Segoe UI", sans-serif;
+  --mono:ui-monospace, "SF Mono", "Cascadia Mono", Menlo, monospace;
+  /* controls bar height — grid insets by this amount */
+  --bar-h: 64px;
+}
+
+*{ box-sizing:border-box; -webkit-tap-highlight-color:transparent; }
+
+html,body{
+  margin:0; padding:0; height:100%; width:100%;
+  background:var(--bg); color:var(--ink);
+  font-family:var(--font);
+  overflow:hidden; overscroll-behavior:none;
+  -webkit-user-select:none; user-select:none;
+}
+
+/* ===== STAGE + GRID ===== */
+#stage{
+  position:fixed;
+  inset:0 0 var(--bar-h) 0;  /* leave room for controls bar below */
+}
+.grid{
+  position:absolute; inset:0;
+  display:grid;
+  grid-template-columns:repeat(4,1fr);
+  grid-template-rows:repeat(4,1fr);
+  gap:0;
+}
+
+/* ============================================================
+   INDIVIDUAL PAD — flippable card
+   ============================================================ */
+.pad{
+  position:relative;
+  perspective:900px;
+  overflow:hidden;
+  cursor:pointer;
+}
+
+.pad-inner{
+  position:absolute; inset:0;
+  transform-style:preserve-3d;
+  transition:transform 520ms cubic-bezier(.4,.0,.2,1);
+}
+.pad.flipped .pad-inner{
+  transform:rotateY(180deg);
+}
+
+.pad-front, .pad-back{
+  position:absolute; inset:0;
+  backface-visibility:hidden;
+  -webkit-backface-visibility:hidden;
+}
+
+/* ---------- FRONT: painting cell ---------- */
+.pad-front{
+  position:absolute; inset:0; z-index:1;
+  background-size:100% 100%;
+  background-position:center;
+  background-repeat:no-repeat;
+  transition:all .3s ease;
+}
+
+.pad.muted .pad-front{
+  filter:grayscale(1) brightness(.24);
+}
+
+.pad-front::after{
+  content:"";
+  position:absolute; inset:0;
+  pointer-events:none;
+  opacity:0;
+  background:radial-gradient(circle, rgba(255,255,255,.18) 0%, transparent 68%);
+  transition:opacity 140ms ease;
+}
+.pad.pressed .pad-front::after{ opacity:1; }
+.pad.pressed .pad-front{
+  filter:brightness(1.28) saturate(1.1) !important;
+  transition-duration:28ms !important;
+}
+
+@media(hover:hover){
+  .pad:not(.muted):not(.pressed) .pad-front:hover::after{ opacity:.35; }
+  .pad.muted:not(.pressed) .pad-front:hover{
+    filter:grayscale(.5) brightness(.34);
+  }
+}
+
+/* ---------- BACK: oscilloscope ---------- */
+.pad-back{
+  background: rgba(20, 20, 25, 0.3);
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
+  transform:rotateY(180deg);
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  border-radius: 8px;
+  box-shadow: inset 0 0 30px rgba(0,0,0,0.4), 0 8px 30px rgba(0,0,0,0.2);
+  display:flex; flex-direction:column; align-items:center; justify-content:space-between;
+}
+.pad-label{
+  font-family:var(--font-mono); font-size:10px; color:#aaa; letter-spacing:.1em;
+  padding:10px 0;
+  text-align:center;
+}
+.scope{ width:100%; height:80px; flex-grow:1; display:block; opacity:.7; mix-blend-mode:screen; }
+
+/* Cents tuning on Side B */
+.cents-ctrl {
+  width: 90%; margin-bottom: 15px;
+  display: flex; flex-direction: column; align-items: center; gap: 6px;
+  z-index: 10; pointer-events: auto;
+}
+.cents-ctrl label {
+  font-size: 8px; font-family: var(--font-mono); color: rgba(255,255,255,0.5); letter-spacing: 0.1em;
+}
+.cents-slider {
+  -webkit-appearance: none; appearance: none;
+  width: 100%; height: 2px;
+  background: rgba(255,255,255,0.2); outline: none; margin: 0;
+}
+.cents-slider::-webkit-slider-thumb {
+  -webkit-appearance: none; appearance: none;
+  width: 8px; height: 12px; background: #fff; cursor: pointer; border-radius: 1px;
+}
+.cents-slider::-moz-range-thumb {
+  width: 8px; height: 12px; background: #fff; border: none; cursor: pointer; border-radius: 1px;
+}
+
+.pad.muted .pad-back{ opacity:.25; }
+.pad.pressed .pad-back{ background:#0e0e11; }
+
+
+/* Mode-gated: no flip buttons outside SWITCH */
+.grid:not([data-mode="switch"]) .pad-flip{ display:none; }
+
+/* ===== CONTROLS BAR — compact floating strip ===== */
+#controls{
+  position:fixed; z-index:40;
+  left:0; right:0;
+  bottom:0;
+  height:calc(var(--bar-h) + 12px);
+  display:flex; align-items:center; justify-content:center;
+  gap:min(2vw, 12px);
+  padding:0 20px calc(env(safe-area-inset-bottom, 0px));
+  background:rgba(10, 10, 15, 0.4);
+  backdrop-filter: blur(24px);
+  -webkit-backdrop-filter: blur(24px);
+  border-top:1px solid rgba(255,255,255,.1);
+  box-shadow: 0 -8px 40px rgba(0, 0, 0, 0.4);
+  pointer-events:auto;
+  overflow-x:auto;
+  -webkit-overflow-scrolling:touch;
+  scrollbar-width: none;
+}
+#controls::-webkit-scrollbar {
+  display: none;
+}
+@media (max-width: 960px) {
+  #controls {
+    justify-content: flex-start;
+  }
+  #controls::after {
+    content: "";
+    min-width: 20px;
+  }
+}
+
+.ctrl{
+  pointer-events:auto;
+  display:flex; flex-direction:row; align-items:center;
+  gap:10px;
+}
+.ctrl label{
+  font-size:8px; letter-spacing:.28em; text-transform:uppercase;
+  color:var(--ink-dim); font-weight:400;
+  white-space:nowrap;
+}
+
+/* Separator between control groups */
+.ctrl-sep{
+  width:1px; height:20px;
+  background:rgba(255,255,255,.08);
+  flex-shrink:0;
+}
+
+/* Form + Root sliders */
+.form-ctrl, .root-ctrl{ gap:8px; }
+.form-slider{
+  -webkit-appearance:none; appearance:none;
+  width:min(14vw, 75px); height:6px;
+  background:rgba(255,255,255,0.15);
+  border:none;
+  outline:none; margin:0; cursor:pointer;
+  border-radius:4px;
+  box-shadow: inset 0 1px 3px rgba(0,0,0,0.5);
+}
+.form-slider::-webkit-slider-thumb{
+  -webkit-appearance:none; appearance:none;
+  width:16px; height:16px;
+  background:#fff; border:none; cursor:pointer;
+  border-radius:50%;
+  box-shadow: 0 2px 6px rgba(0,0,0,0.4);
+}
+.form-slider::-moz-range-thumb{
+  width:16px; height:16px;
+  background:#fff; border:none; cursor:pointer;
+  border-radius:50%;
+  box-shadow: 0 2px 6px rgba(0,0,0,0.4);
+}
+.root-slider{ width:min(12vw, 65px); }
+
+/* Knobs */
+.knob{
+  width:36px; height:36px;
+  cursor:ns-resize; touch-action:none;
+  flex-shrink:0;
+}
+.knob svg{ width:100%; height:100%; display:block; }
+.knob:focus-visible{ outline:none; }
+
+/* FX knob */
+.fx-knob{ cursor:pointer; }
+.fx-knob.fx-active #fx-dot{ stroke:var(--accent); }
+
+.mode-btn{
+  background:rgba(255, 255, 255, 0.08);
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
+  border:1px solid rgba(255, 255, 255, 0.2);
+  border-radius:20px;
+  color:#fff;
+  font-family:var(--mono);
+  font-size:9px; letter-spacing:.22em;
+  text-transform:uppercase;
+  padding:8px 14px;
+  cursor:pointer;
+  transition:all .3s ease;
+  white-space:nowrap;
+  line-height:1;
+  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+}
+.mode-btn:hover {
+  background:rgba(255, 255, 255, 0.15);
+  border-color:rgba(255, 255, 255, 0.4);
+  box-shadow: 0 6px 20px rgba(0, 0, 0, 0.3);
+  transform: translateY(-1px);
+}
+.mode-btn:active {
+  transform: translateY(1px);
+}
+
+.mode-btn.mode-active{ color:var(--accent); border-color:var(--accent); }
+
+.icon-btn {
+  padding: 8px 12px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+.icon-btn svg {
+  width: 18px;
+  height: 18px;
+  color: rgba(255, 255, 255, 0.7);
+  transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+}
+.icon-btn:hover {
+  background: rgba(255, 255, 255, 0.2);
+  border-color: rgba(255, 255, 255, 0.6);
+  box-shadow: 0 0 15px rgba(255, 255, 255, 0.15);
+}
+.icon-btn:hover svg {
+  color: #fff;
+  transform: scale(1.15);
+}
+
+/* ===== OVERLAYS ===== */
+.overlay{
+  position:fixed; inset:0; z-index:50;
+  background:rgba(4,4,6,.96);
+  display:flex; align-items:center; justify-content:center;
+  backdrop-filter:blur(8px); -webkit-backdrop-filter:blur(8px);
+}
+.overlay[hidden]{ display:none; }
+.overlay-inner{
+  max-width:520px; width:86%; max-height:80vh; overflow:auto;
+  padding:12px 8px; color:var(--ink);
+}
+.overlay-inner h1{
+  font-weight:200; font-size:22px;
+  letter-spacing:.08em; margin:0 0 18px;
+}
+.overlay-inner p{
+  font-weight:300; font-size:14px;
+  line-height:1.8; color:#ccc;
+}
+.overlay-inner .lead{ color:var(--ink); }
+.overlay-inner em{ font-style:italic; color:#fff; }
+.overlay-inner a{
+  color:#fff; text-decoration:underline;
+  text-underline-offset:3px;
+}
+.overlay-inner .credit{
+  font-size:11px; color:#888; margin-top:24px;
+}
+.overlay-close{
+  position:absolute; top:16px; right:20px;
+  background:none; border:none; color:#888;
+  font-size:30px; line-height:1; cursor:pointer; font-weight:200;
+}
+.overlay-close:hover{ color:#fff; }
+
+/* ===== SPLASH ===== */
+.splash{
+  z-index:60; cursor:pointer;
+  background:rgba(4,4,6,.92);
+}
+.splash-inner{
+  text-align:center;
+  display:flex; flex-direction:column; align-items:center;
+}
+.splash-title{
+  font-weight:200;
+  font-size:clamp(36px, 8vw, 72px);
+  letter-spacing:.22em;
+  color:#e0e0e0;
+}
+.splash-rule{
+  width:1px; height:42px;
+  background:rgba(255,255,255,.10);
+  margin:28px 0;
+}
+.splash-sub{
+  font-size:10px; letter-spacing:.4em;
+  color:rgba(255,255,255,.28);
+  font-weight:300;
+}
+.splash.fade{
+  opacity:0; pointer-events:none;
+  transition:opacity .6s;
+}
+
+/* ===== BANNER ===== */
+.banner{
+  position:fixed; z-index:70;
+  left:50%; bottom:calc(var(--bar-h) + 10px); transform:translateX(-50%);
+  background:rgba(18,18,20,.92);
+  border:1px solid rgba(255,255,255,.07);
+  color:#999; font-size:10px; letter-spacing:.04em;
+  padding:8px 16px; max-width:88vw; text-align:center;
+  border-radius:6px;
+}
+.banner[hidden]{ display:none; }
+
+/* ===== RESPONSIVE ===== */
+@media(max-width:800px){
+  #controls { gap: 12px; }
+  .form-slider, .root-slider { width: 60px; }
+}
+
+@media(max-width:600px){
+  :root{ --bar-h:56px; }
+  #controls{ gap:10px; }
+  .ctrl label{ font-size:7px; letter-spacing:.2em; }
+  .knob{ width:30px; height:30px; }
+  .pad-flip{ width:16px; height:16px; font-size:9px; }
+  .corner-btn{ width:32px; height:32px; }
+}
+@media(max-width:380px){
+  :root{ --bar-h:52px; }
+  #controls{ gap:14px; }
+  .ctrl-sep{ display:none; }
+}

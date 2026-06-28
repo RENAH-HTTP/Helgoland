@@ -1,0 +1,143 @@
+{
+    "filetype": "C74Snapshot",
+    "version": 2,
+    "minorversion": 0,
+    "name": "untitled",
+    "origin": "779f8ff5-7227-11f1-8ff5-48e7dac28ffc",
+    "type": "rnbo",
+    "subtype": "",
+    "embed": 1,
+    "snapshot": {
+        "__presetid": "779f8ff5-7227-11f1-8ff5-48e7dac28ffc",
+        "__sps": {
+            "square[10]": {
+                "__sps": {
+                    "form_alg[3]": {                    },
+                    "form_alg[2]": {                    },
+                    "form_alg[1]": {                    },
+                    "form_alg": {                    }
+                }
+            },
+            "square[3]": {
+                "__sps": {
+                    "form_alg": {                    },
+                    "form_alg[2]": {                    },
+                    "form_alg[3]": {                    },
+                    "form_alg[1]": {                    }
+                }
+            },
+            "square[14]": {
+                "__sps": {
+                    "form_alg[3]": {                    },
+                    "form_alg[2]": {                    },
+                    "form_alg[1]": {                    },
+                    "form_alg": {                    }
+                }
+            },
+            "square[7]": {
+                "__sps": {
+                    "form_alg": {                    },
+                    "form_alg[1]": {                    },
+                    "form_alg[2]": {                    },
+                    "form_alg[3]": {                    }
+                }
+            },
+            "square[11]": {
+                "__sps": {
+                    "form_alg[3]": {                    },
+                    "form_alg[2]": {                    },
+                    "form_alg": {                    },
+                    "form_alg[1]": {                    }
+                }
+            },
+            "square[15]": {
+                "__sps": {
+                    "form_alg[3]": {                    },
+                    "form_alg[2]": {                    },
+                    "form_alg[1]": {                    },
+                    "form_alg": {                    }
+                }
+            },
+            "square[2]": {
+                "__sps": {
+                    "form_alg": {                    },
+                    "form_alg[1]": {                    },
+                    "form_alg[2]": {                    },
+                    "form_alg[3]": {                    }
+                }
+            },
+            "square[6]": {
+                "__sps": {
+                    "form_alg": {                    },
+                    "form_alg[1]": {                    },
+                    "form_alg[2]": {                    },
+                    "form_alg[3]": {                    }
+                }
+            },
+            "square[9]": {
+                "__sps": {
+                    "form_alg[3]": {                    },
+                    "form_alg[2]": {                    },
+                    "form_alg[1]": {                    },
+                    "form_alg": {                    }
+                }
+            },
+            "square": {
+                "__sps": {
+                    "form_alg": {                    },
+                    "form_alg[1]": {                    },
+                    "form_alg[2]": {                    },
+                    "form_alg[3]": {                    }
+                }
+            },
+            "square[13]": {
+                "__sps": {
+                    "form_alg[3]": {                    },
+                    "form_alg[1]": {                    },
+                    "form_alg[2]": {                    },
+                    "form_alg": {                    }
+                }
+            },
+            "square[1]": {
+                "__sps": {
+                    "form_alg": {                    },
+                    "form_alg[1]": {                    },
+                    "form_alg[2]": {                    },
+                    "form_alg[3]": {                    }
+                }
+            },
+            "square[5]": {
+                "__sps": {
+                    "form_alg": {                    },
+                    "form_alg[1]": {                    },
+                    "form_alg[2]": {                    },
+                    "form_alg[3]": {                    }
+                }
+            },
+            "square[4]": {
+                "__sps": {
+                    "form_alg": {                    },
+                    "form_alg[1]": {                    },
+                    "form_alg[2]": {                    },
+                    "form_alg[3]": {                    }
+                }
+            },
+            "square[8]": {
+                "__sps": {
+                    "form_alg[3]": {                    },
+                    "form_alg[2]": {                    },
+                    "form_alg[1]": {                    },
+                    "form_alg": {                    }
+                }
+            },
+            "square[12]": {
+                "__sps": {
+                    "form_alg[3]": {                    },
+                    "form_alg[2]": {                    },
+                    "form_alg[1]": {                    },
+                    "form_alg": {                    }
+                }
+            }
+        }
+    }
+}
