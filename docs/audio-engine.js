@@ -74,7 +74,7 @@ const AudioEngine = (() => {
 
   function partialsOfSquare(k) {
     const out = [];
-    for (let h = 0; h < NUM_HARMONICS; h++) out.push(k + h * NUM_SQUARES);
+    for (let h = 1; h <= NUM_HARMONICS; h++) out.push(`${k * h}x`);
     return out;
   }
 
@@ -103,19 +103,19 @@ const AudioEngine = (() => {
   const waveBuf        = {};
   const activeState    = {};
 
-  let formValue = 0.8, loudnessValue = 0.15;
+  let formValue = 0.8, loudnessValue = 0.1;
 
-  // --- Mode: 0 = PAD, 1 = SEQUENCE, 2 = SWITCH --------------------------
-  const MODE_NAMES = ["PAD", "SEQUENCE", "SWITCH"];
-  let mode = 1;
+  // --- Mode: 0 = STILL, 1 = MOTION, 2 = INTERACT --------------------------
+  const MODE_NAMES = ["STILL", "MOTION", "INTERACT"];
+  let mode = 1; // Default to MOTION
   let seqTimer = null;
   let autoTune = true;
   // Minor Pentatonic scale across 3 octaves (-12 to +12)
   const PENTATONIC = [-12, -9, -7, -5, -2, 0, 3, 5, 7, 10, 12];
 
-  // --- Effects: 0 = OFF, 1 = REVERB, 2 = ECHO, 3 = FM -------------------
-  const FX_NAMES = ["OFF", "REVERB", "ECHO", "FM"];
-  let fxPreset = 1;
+  // --- Effects: 0 = OFF, 1 = HALL, 2 = DELAY, 3 = CHAOS -------------------
+  const FX_NAMES = ["OFF", "HALL", "DELAY", "CHAOS"];
+  let fxPreset = 0;
   let fxWetValue = 0.2;
 
   // --- Tempo: 0 = SLOW, 1 = MED, 2 = FAST -------------------------------
@@ -152,12 +152,25 @@ const AudioEngine = (() => {
     masterGain.gain.value = Math.pow(loudnessValue, 3) * 0.35;
 
     compressor = ctx.createDynamicsCompressor();
-    compressor.threshold.value = -6;
-    compressor.knee.value      = 6;
-    compressor.ratio.value     = 12;
-    compressor.attack.value    = 0.003;
-    compressor.release.value   = 0.12;
-    compressor.connect(ctx.destination);
+    // Fast limiter settings
+    compressor.threshold.value = -3;
+    compressor.knee.value      = 0;
+    compressor.ratio.value     = 20;
+    compressor.attack.value    = 0.002;
+    compressor.release.value   = 0.1;
+
+    // Soft Clipper to prevent any final digital clipping
+    const clipper = ctx.createWaveShaper();
+    const curve = new Float32Array(44100);
+    for (let i = 0; i < 44100; i++) {
+      const x = (i * 2) / 44100 - 1;
+      curve[i] = Math.tanh(x * 1.2);
+    }
+    clipper.curve = curve;
+    clipper.oversample = '2x';
+
+    compressor.connect(clipper);
+    clipper.connect(ctx.destination);
 
     for (let k = 1; k <= NUM_SQUARES; k++) {
       const sg = ctx.createGain(); sg.gain.value = 1.0;
@@ -179,7 +192,29 @@ const AudioEngine = (() => {
 
     buildFXChain();
     started = true;
+    unlock();
+  }
+
+  // --- iOS audio unlocker ---
+  function unlock() {
+    if (!ctx) return;
     if (ctx.state === "suspended") ctx.resume();
+    // Play silent buffer to force audio hardware to wake up (iOS Safari)
+    const osc = ctx.createOscillator();
+    const gain = ctx.createGain();
+    gain.gain.value = 0;
+    osc.connect(gain);
+    gain.connect(ctx.destination);
+    osc.start(0);
+    osc.stop(ctx.currentTime + 0.001);
+  }
+  
+  // Attempt to unlock on any user interaction as a fallback
+  if (typeof window !== "undefined") {
+    const unlockFn = () => { if (started) unlock(); };
+    ["touchstart", "click"].forEach(evt => {
+      window.addEventListener(evt, unlockFn, { capture: true });
+    });
   }
 
   // --- FX chain ----------------------------------------------------------

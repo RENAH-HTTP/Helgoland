@@ -14,32 +14,42 @@
 <body>
 
   <main id="stage">
-    <div id="grid" class="grid" data-mode="switch" role="group" aria-label="16 spectral voices"></div>
+    <div id="grid" class="grid" data-mode="motion" role="group" aria-label="16 spectral voices"></div>
   </main>
 
   <!-- ======== CONTROLS BAR ======== -->
   <div id="controls" aria-label="Controls">
+    <button id="controls-toggle" type="button" aria-label="Toggle Controls">▼</button>
+
+    <div id="controls-scroll">
 
     <div class="ctrl form-ctrl">
-      <label for="form">FORM</label>
-      <input id="form" class="form-slider" type="range" min="0" max="1" step="0.001" value="0" aria-label="Form" />
+      <label for="form">TEXTURE</label>
+      <input id="form" class="form-slider" type="range" min="0" max="1" step="0.001" value="0" aria-label="Texture" />
     </div>
 
     <div class="ctrl flow-ctrl" id="flow-container" style="display: none;">
-      <label>FLOW</label>
-      <button id="flow-btn" class="mode-btn" type="button" aria-label="Random Flow">
-        <span id="flow-label" style="color: rgba(255,255,255,0.3);">OFF</span>
+      <label>MORPH</label>
+      <button id="flow-btn" class="mode-btn" type="button" aria-label="Morph">
+        <span id="flow-label" style="color: var(--text-main);">OFF</span>
+      </button>
+    </div>
+
+    <div class="ctrl pitch-auto-ctrl" id="pitch-auto-container" style="display: none;">
+      <label>DRIFT</label>
+      <button id="pitch-auto-btn" class="mode-btn" type="button" aria-label="Drift">
+        <span id="pitch-auto-label" style="color: var(--text-main);">OFF</span>
       </button>
     </div>
 
     <div class="ctrl root-ctrl">
-      <label for="root">ROOT</label>
-      <input id="root" class="form-slider root-slider" type="range" min="40" max="120" step="1" value="80" aria-label="Root frequency" />
+      <label for="root">GRAVITY</label>
+      <input id="root" class="form-slider root-slider" type="range" min="40" max="120" step="1" value="80" aria-label="Gravity (Hz)" />
     </div>
 
     <div class="ctrl loud-ctrl">
-      <label for="loudness">LOUD</label>
-      <input id="loudness" class="form-slider" type="range" min="0" max="1" step="0.01" value="0.15" aria-label="Loudness" />
+      <label for="loudness">VOLUME</label>
+      <input id="loudness" class="form-slider" type="range" min="0" max="1" step="0.01" value="0.1" aria-label="Volume" />
     </div>
 
 
@@ -47,34 +57,34 @@
     <div class="ctrl mode-ctrl">
       <label>MODE</label>
       <button id="mode-btn" class="mode-btn" type="button" aria-label="Mode">
-        <span id="mode-label">SWITCH</span>
+        <span id="mode-label">MOTION</span>
       </button>
     </div>
 
     <div class="ctrl auto-tune-ctrl" id="auto-tune-container" style="display: none;">
-      <label>TUNE</label>
-      <button id="auto-tune-btn" class="mode-btn" type="button" aria-label="Auto Tune">
-        <span id="auto-tune-label" style="color: rgba(255,255,255,0.3);">OFF</span>
+      <label>HARMONIZE</label>
+      <button id="auto-tune-btn" class="mode-btn" type="button" aria-label="Harmonize">
+        <span id="auto-tune-label" style="color: var(--accent);">ON</span>
       </button>
     </div>
 
     <div class="ctrl tempo-ctrl" id="tempo-container" style="display: none;">
-      <label>TEMPO</label>
-      <button id="tempo-btn" class="mode-btn" type="button" aria-label="Tempo">
-        <span id="tempo-label">MED</span>
+      <label>SPEED</label>
+      <button id="tempo-btn" class="mode-btn mode-active" type="button" aria-label="Speed">
+        <span id="tempo-label" style="color: var(--text-main);">MED</span>
       </button>
     </div>
 
     <div class="ctrl fx-toggle-ctrl">
-      <label>FX</label>
-      <button id="fx-toggle-btn" class="mode-btn" type="button" aria-label="Toggle Effect">
+      <label>SPACE</label>
+      <button id="fx-toggle-btn" class="mode-btn" type="button" aria-label="Toggle Space">
         <span id="fx-name">OFF</span>
       </button>
     </div>
 
     <div class="ctrl fx-mix-ctrl">
-      <label for="fx-slider">MIX</label>
-      <input id="fx-slider" class="form-slider" type="range" min="0" max="1" step="0.01" value="0.2" aria-label="FX Mix" />
+      <label for="fx-slider">AMOUNT</label>
+      <input id="fx-slider" class="form-slider" type="range" min="0" max="1" step="0.01" value="0.2" aria-label="Space Amount" />
     </div>
     <div class="ctrl flip-ctrl">
       <button id="flip-all-btn" class="mode-btn icon-btn" type="button" aria-label="Flip all pads" title="Flip all pads">
@@ -88,58 +98,93 @@
       </button>
     </div>
 
+    </div>
   </div>
 
   <!-- Info overlay -->
   <div id="info-overlay" class="overlay" hidden>
     <div class="overlay-inner info-scrollable">
       <button id="info-close" class="overlay-close" aria-label="Close">×</button>
-      <h1>Helgoland Spectral Lattice</h1>
-      <p class="lead">An interactive audio-visual instrument after Arthur Segal's painting 
-        <a href="https://berlinischegalerie.de/en/collection/collection-online/the-fine-art-collection-online/" target="_blank" rel="noopener"><em>Helgoland</em> (1923)</a>.</p>
       
-      <p>Developed for the <strong>Sounding Collection Workshop</strong>.</p>
-      
-      <p>The piece follows Segal's principle of <em>Gleichwertigkeit</em> — Equivalence: no element holds hierarchy over another. A single harmonic tone is decomposed into sixteen spectral slices. Only with all sixteen sounding together is the complete waveform reconstructed.</p>
-      
-      <p><strong>Switch</strong> — toggle slices on and off; flip any pad to see its waveform.<br/>
-        <strong>Pad</strong> — hold to play, release to stop.<br/>
-        <strong>Sequence</strong> — the lattice plays itself.</p>
+      <div class="tabs-nav">
+        <button class="tab-btn active" data-target="tab-guide">GUIDE</button>
+        <button class="tab-btn" data-target="tab-about">ABOUT</button>
+      </div>
 
-      <hr class="info-divider" />
+      <!-- GUIDE TAB -->
+      <div id="tab-guide" class="tab-pane active">
+        <h1>Instrument Guide</h1>
+        <p class="lead">How to interact with the Spectral Lattice.</p>
+        
+        <h3>The Canvas</h3>
+        <p>The painting is divided into 16 slices. Each slice represents a harmonic piece of a musical tone. Tap or hold any slice to sound it. When all 16 are playing, the complete spectrum is reconstructed.</p>
+        
+        <h3>Side B: Tuning</h3>
+        <p>In <strong>INTERACT</strong> mode, flip any card by clicking the arrow in the top right. This reveals Side B (the oscilloscope). Here, you can physically tune that specific pad by dragging the Cents slider, allowing for microtonal exploration.</p>
+        
+        <h3>Modes</h3>
+        <ul style="margin-left: 20px; margin-bottom: 24px; line-height: 1.6;">
+          <li><strong>INTERACT:</strong> Manually toggle slices on or off. Great for static ambient soundscapes and manual tuning.</li>
+          <li><strong>STILL:</strong> Tap slices to play them momentarily like drum pads or a keyboard.</li>
+          <li><strong>MOTION:</strong> A generative mode where the painting comes alive and plays itself autonomously.</li>
+        </ul>
+        
+        <h3>Controls & Automation</h3>
+        <ul style="margin-left: 20px; margin-bottom: 24px; line-height: 1.6;">
+          <li><strong>GRAVITY:</strong> Adjusts the foundational base pitch of the entire painting.</li>
+          <li><strong>TEXTURE:</strong> Shifts the harmonic richness, morphing the sound from hollow to bright.</li>
+          <li><strong>MORPH:</strong> Automatically shifts the TEXTURE slider over time.</li>
+          <li><strong>DRIFT (Interact Mode):</strong> Automatically and organically drifts the tuning of every slice, creating a swirling, detuned chorus effect.</li>
+          <li><strong>HARMONIZE (Motion Mode):</strong> Forces the autonomous sequences into a pleasing musical scale instead of dissonant mathematics.</li>
+        </ul>
+      </div>
 
-      <div class="info-columns">
-        <div class="info-column">
-          <h3>Creator</h3>
-          <p>Created by Theodor-Alexandru Petrea (_renah), a Romanian audio designer and DSP maker based in Berlin, originally from Piatra Neamț. With a background in classical piano, he is passionate about the intersection of physics, art, and philosophy.</p>
-          <p><a href="http://www.renah.info" target="_blank" rel="noopener">www.renah.info</a></p>
-          <p class="license-text">Copyright &copy; 2026. This project is open-source. Anyone using this work or its code must explicitly credit the original creator.</p>
+      <!-- ABOUT TAB -->
+      <div id="tab-about" class="tab-pane">
+        <h1>Helgoland Spectral Lattice</h1>
+        <p class="lead">An interactive audio-visual instrument after Arthur Segal's painting 
+          <a href="https://berlinischegalerie.de/en/collection/collection-online/the-fine-art-collection-online/" target="_blank" rel="noopener"><em>Helgoland</em> (1923)</a>.</p>
+        
+        <p>Developed for the <strong>Sounding Collection Workshop</strong>.</p>
+        
+        <p>The piece follows Segal's principle of <em>Gleichwertigkeit</em> — Equivalence: no element holds hierarchy over another. A single harmonic tone is decomposed into sixteen spectral slices. Only with all sixteen sounding together is the complete waveform reconstructed.</p>
+        
+        <hr class="info-divider" />
+        
+        <div class="info-columns">
+          <div class="info-column">
+            <h3>Creator</h3>
+            <p>Created by Theodor-Alexandru Petrea (_renah), a Romanian audio designer and DSP maker based in Berlin, originally from Piatra Neamț. With a background in classical piano, he is passionate about the intersection of physics, art, and philosophy.</p>
+            <p><a href="http://www.renah.info" target="_blank" rel="noopener">www.renah.info</a></p>
+            <p class="license-text">Copyright &copy; 2026. This project is open-source. Anyone using this work or its code must explicitly credit the original creator.</p>
+          </div>
+          
+          <div class="info-column">
+            <h3>Berlinische Galerie</h3>
+            <p class="address-text">
+              Landesmuseum für Moderne Kunst, Fotografie und Architektur<br/>
+              Stiftung Öffentlichen Rechts<br/>
+              Alte Jakobstraße 124 – 128<br/>
+              10969 Berlin, Germany
+            </p>
+            <p class="contact-text">
+              <a href="mailto:bg@berlinischegalerie.de">bg@berlinischegalerie.de</a><br/>
+              Tel +49 (0)30-789 02-600<br/>
+              Fax +49 (0)30-789 02-700
+            </p>
+          </div>
         </div>
         
-        <div class="info-column">
-          <h3>Berlinische Galerie</h3>
-          <p class="address-text">
-            Landesmuseum für Moderne Kunst, Fotografie und Architektur<br/>
-            Stiftung Öffentlichen Rechts<br/>
-            Alte Jakobstraße 124 – 128<br/>
-            10969 Berlin, Germany
-          </p>
-          <p class="contact-text">
-            <a href="mailto:bg@berlinischegalerie.de">bg@berlinischegalerie.de</a><br/>
-            Tel +49 (0)30-789 02-600<br/>
-            Fax +49 (0)30-789 02-700
-          </p>
+        <div class="info-logos">
+          <a href="http://www.renah.info" target="_blank" rel="noopener">
+            <img src="assets/renah Logo White.jpg" alt="Renah Logo" class="info-logo" />
+          </a>
+          <a href="https://berlinischegalerie.de" target="_blank" rel="noopener">
+            <img src="assets/berlinische_galerie.png" alt="Berlinische Galerie" class="info-logo" />
+          </a>
         </div>
       </div>
-      
-      <div class="info-logos">
-        <a href="http://www.renah.info" target="_blank" rel="noopener">
-          <img src="assets/renah Logo White.jpg" alt="Renah Logo" class="info-logo" />
-        </a>
-        <a href="https://berlinischegalerie.de" target="_blank" rel="noopener">
-          <img src="assets/berlinische_galerie.png" alt="Berlinische Galerie" class="info-logo" />
-        </a>
-      </div>
+
     </div>
   </div>
 

@@ -47,6 +47,15 @@
   const flowBtn     = $("flow-btn");
   const flowLbl     = $("flow-label");
   const flowCnt     = $("flow-container");
+  const pitchAutoBtn= $("pitch-auto-btn");
+  const pitchAutoLbl= $("pitch-auto-label");
+  const pitchAutoCnt= $("pitch-auto-container");
+  const controlsToggleBtn = $("controls-toggle");
+  
+  let randomFlowActive = false;
+  let pitchAutoActive = false;
+  const pitchTargets = new Array(NUM + 1).fill(0);
+  const pitchCurrent = new Array(NUM + 1).fill(0);
 
   const pads   = [];  // 0..15
   const scopes = [];  // 0..15 → { canvas, ctx2d }
@@ -261,34 +270,40 @@
   function updateState() {
     if (AudioEngine.isStarted) startScopes();
     
-    // If any pad is flipped to Side B (manual tuning), disable generative features
-    const anyFlipped = flippedState.some((v) => v);
-    const features = [ $("auto-tune-btn"), $("tempo-btn"), $("flow-btn") ];
+    const m = AudioEngine.getMode();
+    const autoTune = AudioEngine.getAutoTune();
     
-    features.forEach(btn => {
-      if (!btn) return;
-      if (anyFlipped) {
-        btn.style.opacity = "0.3";
-        btn.style.pointerEvents = "none";
-      } else {
-        btn.style.opacity = "1";
-        btn.style.pointerEvents = "auto";
+    // In SEQUENCE mode with Auto Tune ON, or in SWITCH mode with PITCH AUTO ON,
+    // grey out the tuning slider on the cards so they can't be manually adjusted.
+    for (let k = 1; k <= NUM; k++) {
+      const pad = pads[k - 1];
+      if (!pad) continue;
+      const slider = pad.querySelector(".cents-slider");
+      if (slider) {
+        if ((m === 1 && autoTune) || (m === 2 && pitchAutoActive)) {
+          slider.disabled = true;
+          slider.parentElement.style.opacity = "0.3";
+          slider.style.pointerEvents = "none";
+        } else {
+          slider.disabled = false;
+          slider.parentElement.style.opacity = "1";
+          slider.style.pointerEvents = "auto";
+        }
       }
-    });
+    }
   }
 
   // --- Sequence Form LFO ---
   let seqFormTarget = 0;
   let seqFormCurrent = 0;
-  let randomFlowActive = false;
 
   function sequenceFormLoop() {
     const m = AudioEngine.getMode();
     if ((m === 1 || m === 2) && randomFlowActive) { // SEQUENCE or SWITCH & FLOW ON
       const isSwitch = (m === 2);
       // Pick a new random target occasionally (more often in SWITCH mode)
-      const prob = isSwitch ? 0.05 : 0.015;
-      const speed = isSwitch ? 0.012 : 0.003;
+      const prob = isSwitch ? 0.1 : 0.03;
+      const speed = isSwitch ? 0.025 : 0.008;
       
       if (Math.random() < prob) {
         seqFormTarget = Math.random();
@@ -321,6 +336,16 @@
       if (!AudioEngine.isStarted) return;
       const next = (AudioEngine.getMode() + 1) % AudioEngine.MODE_NAMES.length;
       AudioEngine.setMode(next);
+      
+      // Auto-lower volume on entering SWITCH mode to prevent jumpscares
+      if (next === 2) {
+        const loudEl = $("loudness");
+        if (loudEl && parseFloat(loudEl.value) > 0.25) {
+          loudEl.value = 0.25;
+          AudioEngine.setLoudness(0.25);
+        }
+      }
+      
       applyModeUI();
     });
   }
@@ -331,6 +356,11 @@
     modeLabel.textContent = name;
     grid.dataset.mode = name.toLowerCase();
 
+    // If leaving SWITCH mode, unflip all pads
+    if (m !== 2) {
+      unflipAll();
+    }
+
     // Show Auto Tune and Tempo ONLY in SEQUENCE mode
     if (autoTuneCnt) {
       autoTuneCnt.style.display = m === 1 ? "flex" : "none";
@@ -338,9 +368,13 @@
     if (tempoCnt) {
       tempoCnt.style.display = m === 1 ? "flex" : "none";
     }
-    // Show Flow button in SEQUENCE and SWITCH modes
+    // Show Flow button in ALL modes
     if (flowCnt) {
-      flowCnt.style.display = (m === 1 || m === 2) ? "flex" : "none";
+      flowCnt.style.display = "flex";
+    }
+    // Show Pitch Auto button in SWITCH mode only
+    if (pitchAutoCnt) {
+      pitchAutoCnt.style.display = m === 2 ? "flex" : "none";
     }
 
     // Ensure scopes run and UI state is synced
@@ -418,13 +452,14 @@
     // Set initial UI state
     const initState = AudioEngine.getAutoTune();
     autoTuneLbl.textContent = initState ? "ON" : "OFF";
-    autoTuneLbl.style.color = initState ? "var(--accent)" : "rgba(255,255,255,0.3)";
+    autoTuneLbl.style.color = initState ? "var(--accent)" : "var(--text-main)";
 
     autoTuneBtn.addEventListener("click", () => {
       const state = !AudioEngine.getAutoTune();
       AudioEngine.setAutoTune(state);
       autoTuneLbl.textContent = state ? "ON" : "OFF";
-      autoTuneLbl.style.color = state ? "var(--accent)" : "rgba(255,255,255,0.3)";
+      autoTuneLbl.style.color = state ? "var(--accent)" : "var(--text-main)";
+      updateState(); // update tuning slider grey-out
     });
   }
 
@@ -444,12 +479,67 @@
     if (!flowBtn) return;
     
     flowLbl.textContent = randomFlowActive ? "ON" : "OFF";
-    flowLbl.style.color = randomFlowActive ? "var(--accent)" : "rgba(255,255,255,0.3)";
+    flowLbl.style.color = randomFlowActive ? "var(--accent)" : "var(--text-main)";
 
     flowBtn.addEventListener("click", () => {
       randomFlowActive = !randomFlowActive;
       flowLbl.textContent = randomFlowActive ? "ON" : "OFF";
-      flowLbl.style.color = randomFlowActive ? "var(--accent)" : "rgba(255,255,255,0.3)";
+      flowLbl.style.color = randomFlowActive ? "var(--accent)" : "var(--text-main)";
+    });
+  }
+
+  function pitchAutoLoop() {
+    if (pitchAutoActive && AudioEngine.getMode() === 2) {
+      for (let k = 1; k <= NUM; k++) {
+        // More aggressive: pick new targets more often, wider range, faster easing
+        if (Math.random() < 0.015) {
+          pitchTargets[k] = (Math.random() * 200) - 100; // -100c to +100c
+        }
+        pitchCurrent[k] += (pitchTargets[k] - pitchCurrent[k]) * 0.02;
+        AudioEngine.setPadPitch(k, pitchCurrent[k] / 100);
+        
+        if (flippedState[k - 1]) {
+          const slider = pads[k - 1].querySelector(".cents-slider");
+          const label = pads[k - 1].querySelector(".cents-ctrl label");
+          if (slider && label) {
+            const cents = Math.round(pitchCurrent[k]);
+            slider.value = cents;
+            label.textContent = `TUNE (${cents > 0 ? '+' : ''}${cents}c)`;
+          }
+        }
+      }
+    } else {
+      for (let k = 1; k <= NUM; k++) {
+        pitchTargets[k] = pitchCurrent[k];
+      }
+    }
+    requestAnimationFrame(pitchAutoLoop);
+  }
+
+  function wirePitchAuto() {
+    if (!pitchAutoBtn) return;
+    pitchAutoBtn.addEventListener("click", () => {
+      pitchAutoActive = !pitchAutoActive;
+      pitchAutoLbl.textContent = pitchAutoActive ? "ON" : "OFF";
+      pitchAutoLbl.style.color = pitchAutoActive ? "var(--accent)" : "var(--text-main)";
+      updateState();
+    });
+    pitchAutoLoop();
+  }
+
+  function wireControlsToggle() {
+    if (!controlsToggleBtn) return;
+    const controlsContainer = $("controls");
+    controlsToggleBtn.addEventListener("click", () => {
+      if (controlsContainer) {
+        controlsContainer.classList.toggle("collapsed");
+        document.body.classList.toggle("controls-collapsed");
+        if (controlsContainer.classList.contains("collapsed")) {
+          controlsToggleBtn.innerHTML = "▲";
+        } else {
+          controlsToggleBtn.innerHTML = "▼";
+        }
+      }
     });
   }
 
@@ -460,10 +550,30 @@
     overlay.addEventListener("click", (e) => {
       if (e.target === overlay) overlay.hidden = true;
     });
+
+    const tabBtns = document.querySelectorAll(".tab-btn");
+    const tabPanes = document.querySelectorAll(".tab-pane");
+    tabBtns.forEach(btn => {
+      btn.addEventListener("click", () => {
+        const targetId = btn.getAttribute("data-target");
+        
+        tabBtns.forEach(b => b.classList.remove("active"));
+        tabPanes.forEach(p => p.classList.remove("active"));
+        
+        btn.classList.add("active");
+        const targetPane = document.getElementById(targetId);
+        if (targetPane) targetPane.classList.add("active");
+      });
+    });
   }
 
   function wireSplash() {
-    const enter = () => {
+    let entered = false;
+    const enter = (e) => {
+      if (entered) return;
+      entered = true;
+      if (e.type === "touchstart") e.preventDefault();
+
       AudioEngine.init();
       // Trigger the engine to fully start in its default mode
       AudioEngine.setMode(AudioEngine.getMode());
@@ -471,9 +581,11 @@
       applyModeUI();
       splash.classList.add("fade");
       setTimeout(() => { splash.hidden = true; }, 620);
-      splash.removeEventListener("pointerdown", enter);
     };
-    splash.addEventListener("pointerdown", enter);
+    
+    ["click", "touchstart", "pointerdown"].forEach(evt => {
+      splash.addEventListener(evt, enter, { once: true });
+    });
   }
 
   // Listen for engine-driven square changes (SEQUENCE + auto)
@@ -499,7 +611,12 @@
     return true;
   }
 
+  let drawFrameCount = 0;
   function drawScopes() {
+    scopeRAF = requestAnimationFrame(drawScopes);
+    drawFrameCount++;
+    if (drawFrameCount % 2 !== 0) return; // Cut framerate in half (30fps) for performance
+
     const dpr = window.devicePixelRatio || 1;
     const isSwitch = AudioEngine.getMode() === 2;
 
@@ -547,7 +664,6 @@
         g.stroke();
       }
     }
-    scopeRAF = requestAnimationFrame(drawScopes);
   }
 
   function startScopes() { if (!scopeRAF) scopeRAF = requestAnimationFrame(drawScopes); }
@@ -577,6 +693,8 @@
   wireAutoTune();
   wireTempo();
   wireFlow();
+  wirePitchAuto();
+  wireControlsToggle();
   wireInfo();
   wireEngineEvents();
   wireSplash();
