@@ -89,6 +89,11 @@
       const back = document.createElement("div");
       back.className = "pad-back";
 
+      const backBg = document.createElement("div");
+      backBg.className = "pad-back-bg";
+      backBg.style.backgroundImage = `url("${CELL_PATH(k)}")`;
+      back.appendChild(backBg);
+
       const label = document.createElement("div");
       label.className = "pad-label";
       const partials = AudioEngine.partialsOfSquare(k);

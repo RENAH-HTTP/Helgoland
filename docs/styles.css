@@ -106,24 +106,34 @@ body.controls-collapsed #stage {
 
 /* ---------- BACK: oscilloscope ---------- */
 .pad-back{
-  /* The inline style applies the cell image. We use box-shadow for a dark wash. */
   background-color: #1a1917; 
-  background-size: 100% 100%;
-  background-position: center;
-  background-repeat: no-repeat;
-  box-shadow: inset 0 0 0 1000px rgba(26, 25, 23, 0.85);
   
   transform:rotateY(180deg);
   border: 1px solid rgba(220, 216, 201, 0.15);
   border-radius: 0; /* Geometric */
   display:flex; flex-direction:column; align-items:center; justify-content:space-between;
 }
+.pad-back > *:not(.pad-back-bg) {
+  position: relative;
+  z-index: 1;
+}
+.pad-back-bg {
+  position: absolute;
+  inset: -20px;
+  background-size: 100% 100%;
+  background-position: center;
+  background-repeat: no-repeat;
+  filter: blur(14px) brightness(0.3) contrast(1.1);
+  z-index: 0;
+  pointer-events: none;
+}
 .pad-label{
-  font-family:var(--mono); font-size:10px; color:var(--ink-dim); letter-spacing:.1em;
+  font-family:var(--mono); font-size:10px; color:var(--ink); letter-spacing:.1em;
   padding:10px 0;
   text-align:center;
+  text-shadow: 0 2px 4px rgba(0,0,0,0.8);
 }
-.scope{ width:100%; height:80px; flex-grow:1; display:block; opacity:.85; mix-blend-mode:screen; }
+.scope{ width:100%; height:80px; flex-grow:1; display:block; opacity:.95; mix-blend-mode:screen; }
 
 /* Cents tuning on Side B */
 .cents-ctrl {
