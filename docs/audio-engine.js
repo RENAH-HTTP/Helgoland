@@ -45,8 +45,10 @@ const AudioEngine = (() => {
       return fundamentalHz * Math.pow(2, seqPitchSemitones[k] / 12) * h;
     }
     
-    // Default Spectral Lattice: base fundamental is multiplied by k, plus manual pad tuning
-    return fundamentalHz * k * Math.pow(2, padPitchSemitones[k] / 12) * h;
+    // Default Spectral Lattice: pad k owns a comb of harmonics k, k+16, k+32, ... (h = 1..8),
+    // so all 16 pads together tile the full harmonic series 1..128. Manual pad tuning shifts the comb.
+    const harmonicNumber = k + NUM_SQUARES * (h - 1);
+    return fundamentalHz * harmonicNumber * Math.pow(2, padPitchSemitones[k] / 12);
   };
 
   const phaseFor = (n) => {
@@ -74,7 +76,7 @@ const AudioEngine = (() => {
 
   function partialsOfSquare(k) {
     const out = [];
-    for (let h = 1; h <= NUM_HARMONICS; h++) out.push(`${k * h}x`);
+    for (let h = 1; h <= NUM_HARMONICS; h++) out.push(`H${k + NUM_SQUARES * (h - 1)}`);
     return out;
   }
 

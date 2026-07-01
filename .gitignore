@@ -1,0 +1,11 @@
+# Local master renders / DAW scratch files — kept on disk, never committed.
+# GitHub rejects files > 100 MB, and these masters don't belong in the site repo.
+/*.wav
+/*.mp3
+/*.aif
+/*.aiff
+/*.flac
+/*.ogg
+
+# Ableton Live analysis files
+*.asd
